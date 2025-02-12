@@ -1,1 +1,1 @@
-export type BlockText = string | null
+export type BlockText = string

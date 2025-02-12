@@ -1,4 +1,4 @@
-import { get, writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import type { AppState } from '$lib/models/states/appState';
 import { addBlockToLine } from '$lib/utils/addBlockToLine';
 import { addNewLine } from '$lib/utils/addNewLine';
@@ -9,39 +9,33 @@ import { NamespaceManager } from '$lib/managers/namespaceManager';
 const namespaceManager = new NamespaceManager()
 
 const initialStore: AppState = {
-	blocks: { '1': { id: '1', text: 'Block 1' }, '2': { id: '2', text: 'Block 2' }, '3': { id: '3', text: 'Block 3' } },
+	blocks: { '1': { id: '1', text: 'Block1' }, '2': { id: '2', text: 'Block2' }, '3': { id: '3', text: 'Block3' } },
 	lines: {
 		'1': { id: '1', blocksId: ['1', '2'] },
 		'2': { id: '2', blocksId: ['3'] },
 	},
 	linesId: ['1', '2'],
-	currentFocusId: '1',
-	currentLineId: '1',
+	currentFocusId: '3',
+	currentLineId: '2',
 }
 
 export const store = writable<AppState>(initialStore);
 
-export function getCurrentBlock() {
-    const state = get(store)
-    return state.currentFocusId ? state.blocks[state.currentFocusId] : null
-}
+export const currentBlock = derived(store, $store => $store.blocks[$store.currentFocusId])
+export const currentLine = derived(store, $store => $store.lines[$store.currentLineId])
 
-export function getCurrentLine() {
-    const state = get(store)
-    return state.currentFocusId ? 
-		state.currentLineId ? 
-			state.lines[state.currentLineId] 
-			: null
-		: null
-}
 
 
 export function addBlock({ lineId, blockId, text, parentBlockId }: AddBlock) {
+	console.log('addBlock', lineId, blockId)
+	let newBlock
 	store.update(state => {
-		const newBlockId = addBlockToLine({ state, lineId, blockId, text, parentBlockId })
-		state.currentFocusId = newBlockId
+		newBlock = addBlockToLine({ state, lineId, blockId, text, parentBlockId })
+		state.currentFocusId = newBlock.id
 		return state // Возвращаем обновленное состояние
-	});
+	})
+
+	return newBlock
 }
 
 export function addOperator({ lineId, blockId, text }: AddOperator) {
@@ -51,14 +45,14 @@ export function addOperator({ lineId, blockId, text }: AddOperator) {
 			lineId, 
 			blockId, 
 			text, 
-			parentBlockId: null
+			parentBlockId: ''
 		})
 		const newBlockId = addBlockToLine({ 
 			state, 
 			lineId, 
 			blockId: operatorBlockId, 
 			text: '', 
-			parentBlockId: null 
+			parentBlockId: '' 
 		})
 		state.currentFocusId = newBlockId
 		return state // Возвращаем обновленное состояние

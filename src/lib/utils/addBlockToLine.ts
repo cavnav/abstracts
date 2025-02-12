@@ -1,9 +1,8 @@
 import type { BlockModel } from '$lib/models/';
-import type { BlockId } from '$lib/types/block';
 import { generateId } from '$lib/utils/generateId';
 import type { AddBlockToLine } from './addBlockToLineTypes';
 
-export function addBlockToLine({ state, lineId, blockId, text, parentBlockId }: AddBlockToLine): BlockId {
+export function addBlockToLine({ state, lineId, blockId, text, parentBlockId }: AddBlockToLine) {
 
 	const newBlockId = generateId();
 
@@ -30,5 +29,5 @@ export function addBlockToLine({ state, lineId, blockId, text, parentBlockId }: 
 		}
 	}
 
-	return newBlockId
+	return newBlock
 }

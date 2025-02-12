@@ -1,7 +1,7 @@
 <script lang="ts">
     import Line from '$lib/components/Line.svelte';
     import { ARITHMETIC_OPERATORS } from '$lib/constants/arithOperators';
-    import { addBlock, addLine, addOperator, getCurrentBlock, getCurrentLine, store } from '$lib/stores/store';
+    import { addBlock, addLine, addOperator, currentBlock, currentLine, store } from '$lib/stores/store';
     import { isVariableName } from '$lib/utils/isVariableName';
     import { getLines } from '$lib/utils/selectors/getLines';
     import { derived } from 'svelte/store';
@@ -47,21 +47,12 @@
         // Обработка пробела для создания переменной и нового блока
         event.preventDefault();
 
-        const currentBlock = getCurrentBlock()
-        const currentLine = getCurrentLine()
-        if (currentLine && currentBlock && isVariableName({name: currentBlock.text})) {
-            addBlock({lineId: currentLine.id, blockId: currentBlock.id, text: '', parentBlockId: null})
-        }
-
-        const newRange = document.createRange();
-        newRange.setStart(newBlock, 0);
-        newRange.setEnd(newBlock, 0);
-
-        selection.removeAllRanges();
-        selection.addRange(newRange);
+        if (isVariableName({name: $currentBlock.text})) {
+            addBlock({lineId: $currentLine.id, blockId: $currentBlock.id, text: '', parentBlockId: ''})            
+        }        
     }
 
-    $: console.log('state', JSON.stringify($store.blocks))
+    $: console.log('state', JSON.stringify($store))
 </script>
 
 <div id="editor" on:keydown={handleKeyDown}>

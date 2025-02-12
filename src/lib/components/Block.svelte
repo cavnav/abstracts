@@ -1,26 +1,33 @@
 <script lang="ts">
     import { store } from "$lib/stores/store";
+    import { placeCursorAtStart } from "$lib/utils/placeCursor";
+    import { derived } from "svelte/store";
 
 	export let id: string;
 	export let text: string;
 
+	const currentFocusId = derived(store, ($store) => $store.currentFocusId);
+
 	let inputElement: HTMLInputElement | undefined
 
-	function handleFocus({currentFocusId}: {currentFocusId: string | null}) {
+	function handleFocus() {
 		console.log('element', inputElement)
-		if (currentFocusId === id && inputElement) {
-			console.log('handleFocus')
-			inputElement.focus();
-			store.update(state => {
-				state.currentFocusId = null;
-				return state;
-			});
+		
+		if (!inputElement) {
+			return
+		}
+		
+		console.log('focus')
+		inputElement.focus()
+
+		if (true) {
+			placeCursorAtStart({element: inputElement})	
 		}
 	}
 
   	$: {
-		if (inputElement) {
-			handleFocus({currentFocusId: $store.currentFocusId})
+		if ($currentFocusId === id && inputElement) {
+			handleFocus()
 		}
 	}
 </script>
