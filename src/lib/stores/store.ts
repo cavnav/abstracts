@@ -15,8 +15,8 @@ const initialStore: AppState = {
 		'2': { id: '2', blocksId: ['3'] },
 	},
 	linesId: ['1', '2'],
-	currentFocusId: '3',
-	currentLineId: '2',
+	currentFocusId: '2',
+	currentLineId: '1',
 }
 
 export const store = writable<AppState>(initialStore);

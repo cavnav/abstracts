@@ -6,38 +6,52 @@
 	export let id: string;
 	export let text: string;
 
-	const currentFocusId = derived(store, ($store) => $store.currentFocusId);
+	const currentFocusId = derived(store, ($store) => $store.currentFocusId)
+	
+	// Используем комбинированный текст: либо из пропса, либо из стора
+	$: finalText = text ? text : $store.blocks[id]?.text || ""
 
 	let inputElement: HTMLInputElement | undefined
 
-	function handleFocus() {
-		console.log('element', inputElement)
-		
+	function handleFocus() {		
 		if (!inputElement) {
 			return
 		}
 		
-		console.log('focus')
 		inputElement.focus()
 
 		if (true) {
-			placeCursorAtStart({element: inputElement})	
+			placeCursorAtStart({block: inputElement})	
 		}
+	}
+
+	function updateText(event: Event) {
+		if (!event) {
+			return
+		}
+
+		const target = event.target as HTMLInputElement 
+		
+		store.update(state => {
+			state.blocks[id].text = target.value
+			return state
+		})
 	}
 
   	$: {
 		if ($currentFocusId === id && inputElement) {
 			handleFocus()
-		}
+		}			
 	}
 </script>
 
 <div class="block">
 	<input
-		bind:this={inputElement}
-		data-block-id={id} 
 		type="text"
-		value={text}
+		value={finalText}
+		data-block-id={id} 
+		bind:this={inputElement}
+		on:input={updateText}
 	/>
 </div>
 

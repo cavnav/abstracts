@@ -1,4 +1,4 @@
-export function placeCursorAtStart({ element:block }: { element: HTMLElement }) {
+export function placeCursorAtStart({ block }: { block: HTMLElement }) {
     block.focus();
 
     // Ищем input внутри блока
