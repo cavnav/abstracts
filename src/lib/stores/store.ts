@@ -17,6 +17,10 @@ const initialStore: AppState = {
 	linesId: ['1', '2'],
 	currentFocusId: '2',
 	currentLineId: '1',
+	linesCount: 1,
+	blocksCount: 1,
+	isChangedLines: false,
+	isChangedBlocks: false
 }
 
 export const store = writable<AppState>(initialStore);
@@ -29,7 +33,7 @@ export const currentLine = derived(store, $store => $store.lines[$store.currentL
 export function addBlock({ lineId, blockId, text, parentBlockId }: AddBlock) {
 	console.log('addBlock', lineId, blockId)
 	let newBlock
-	store.update(state => {
+	updateStore(state => {
 		newBlock = addBlockToLine({ state, lineId, blockId, text, parentBlockId })
 		state.currentFocusId = newBlock.id
 		return state // Возвращаем обновленное состояние
@@ -40,30 +44,52 @@ export function addBlock({ lineId, blockId, text, parentBlockId }: AddBlock) {
 
 export function addOperator({ lineId, blockId, text }: AddOperator) {
 	store.update(state => {
-		const operatorBlockId = addBlockToLine({
+		const operatorBlock = addBlockToLine({
 			state, 
 			lineId, 
 			blockId, 
 			text, 
 			parentBlockId: ''
 		})
-		const newBlockId = addBlockToLine({ 
+		const newBlock = addBlockToLine({ 
 			state, 
 			lineId, 
-			blockId: operatorBlockId, 
+			blockId: operatorBlock.id, 
 			text: '', 
 			parentBlockId: '' 
 		})
-		state.currentFocusId = newBlockId
+		state.currentFocusId = newBlock.id
 		return state // Возвращаем обновленное состояние
 	});
 }
 
 export function addLine({ lineId }: AddLine) {
-	store.update(state => {
+	updateStore(state => {
 		const newLineId = addNewLine({ state, lineId })
-		const newBlockId = addBlockToLine({ state, lineId: newLineId, blockId: null, text: '', parentBlockId: null })
-		state.currentFocusId = newBlockId
-		return state // Возвращаем обновленное состояние
-	});
+		const newBlock = addBlockToLine({ state, lineId: newLineId, blockId: '', text: '', parentBlockId: '' })
+		state.currentFocusId = newBlock.id
+	})
 }
+
+
+// Обёртка для обновления стора и вычисления флагов
+const updateStore = (updater: (state: AppState) => void) => {
+	store.update((state) => {
+	  // Сохраняем исходные значения для проверки изменений
+	  const prevLinesCount = state.linesId.length;
+	  const prevBlocksCount = Object.keys(state.blocks).length;
+  
+	  // Мутируем состояние через updater
+	  updater(state);
+  
+	  // Обновляем счетчики
+	  state.linesCount = state.linesId.length;
+	  state.blocksCount = Object.keys(state.blocks).length;
+  
+	  // Вычисляем флаги изменений
+	  state.isChangedLines = prevLinesCount !== state.linesCount;
+	  state.isChangedBlocks = prevBlocksCount !== state.blocksCount;
+  
+	  return state; // Возвращаем мутированное состояние
+	})
+  }

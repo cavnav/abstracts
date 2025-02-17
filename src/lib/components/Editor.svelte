@@ -4,9 +4,15 @@
     import { addBlock, addLine, addOperator, currentBlock, currentLine, store } from '$lib/stores/store';
     import { isVariableName } from '$lib/utils/isVariableName';
     import { getLines } from '$lib/utils/selectors/getLines';
-    import { derived } from 'svelte/store';
+    import { derived, get } from 'svelte/store';
   
-    const lines = derived(store, ($state) => getLines({state: $state}))
+    // Производный стор, отслеживающий только количество строк и блоков
+    const structureChanges = derived(store, ($state) => ({
+        linesCount: $state.linesId.length,
+        blocksCount: Object.keys($state.blocks).length,
+    }))
+
+    const lines = derived(structureChanges, () => getLines({ state: get(store) }))
 
     $: console.log('lines', $lines.map(line => line.blocks.map(block => block.id)))
 
@@ -56,8 +62,8 @@
 </script>
 
 <div id="editor" on:keydown={handleKeyDown}>
-    {#each $lines as { id, blocks }}
-      <Line {id} {blocks} /> <!-- Передаём уже готовый массив блоков -->
+    {#each $lines as line}
+      <Line {line} /> <!-- Передаём уже готовый массив блоков -->
     {/each}
 </div>
 

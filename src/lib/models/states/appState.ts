@@ -9,4 +9,8 @@ export interface AppState {
     blocks: Record<string, BlockModel>
     currentFocusId: BlockId // ID блока с фокусом
     currentLineId: LineId
+    linesCount: number
+    blocksCount: number
+    isChangedLines: boolean
+    isChangedBlocks: boolean
 }

@@ -1,10 +1,12 @@
 <script lang="ts">
+    import type { BlockModel } from "$lib/models";
     import { store } from "$lib/stores/store";
     import { placeCursorAtStart } from "$lib/utils/placeCursor";
     import { derived } from "svelte/store";
 
-	export let id: string;
-	export let text: string;
+	export let block: BlockModel
+
+	const {id, text} = block
 
 	const currentFocusId = derived(store, ($store) => $store.currentFocusId)
 	
