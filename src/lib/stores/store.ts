@@ -86,10 +86,6 @@ const updateStore = (updater: (state: AppState) => void) => {
 	  state.linesCount = state.linesId.length;
 	  state.blocksCount = Object.keys(state.blocks).length;
   
-	  // Вычисляем флаги изменений
-	  state.isChangedLines = prevLinesCount !== state.linesCount;
-	  state.isChangedBlocks = prevBlocksCount !== state.blocksCount;
-  
 	  return state; // Возвращаем мутированное состояние
 	})
   }

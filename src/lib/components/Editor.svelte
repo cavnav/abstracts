@@ -8,11 +8,14 @@
   
     // Производный стор, отслеживающий только количество строк и блоков
     const structureChanges = derived(store, ($state) => ({
-        linesCount: $state.linesId.length,
-        blocksCount: Object.keys($state.blocks).length,
+        linesCount: $state.linesCount,
+        blocksCount: $state.blocksCount,
     }))
 
-    const lines = derived(structureChanges, () => getLines({ state: get(store) }))
+    const lines = derived(structureChanges, () => {
+        const {lines, blocks, linesId} = get(store)
+        return getLines({lines, blocks, linesId})
+    })
 
     $: console.log('lines', $lines.map(line => line.blocks.map(block => block.id)))
 

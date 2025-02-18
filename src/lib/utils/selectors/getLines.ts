@@ -1,10 +1,9 @@
 import type { BlockModel } from '$lib/models';
-import type { AppState } from '$lib/models/states/appState';
+import type { Blocks } from '$lib/types/block';
+import type { LineId, Lines } from '$lib/types/line';
 
-export function getLines({state}: {state: AppState}): Array<{id: string, blocks: Array<BlockModel>}> {
-  const {lines, blocks} = state
-
-  return state.linesId.map((lineId) => {
+export function getLines({lines, blocks, linesId}: {lines: Lines, blocks: Blocks, linesId: LineId[]}): Array<{id: string, blocks: Array<BlockModel>}> {
+  return linesId.map((lineId) => {
     const line = lines[lineId];
     return {
       id: line.id,

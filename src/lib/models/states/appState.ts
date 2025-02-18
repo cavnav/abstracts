@@ -1,12 +1,12 @@
-import type { BlockId } from "$lib/types/block"
-import type { LineId } from "$lib/types/line"
+import type { BlockId, Blocks } from "$lib/types/block"
+import type { LineId, Lines } from "$lib/types/line"
 import type { BlockModel } from "../block"
 import type { LineModel } from "../line"
 
 export interface AppState {
     linesId: LineId[]
-    lines: Record<string, LineModel>
-    blocks: Record<string, BlockModel>
+    lines: Lines
+    blocks: Blocks
     currentFocusId: BlockId // ID блока с фокусом
     currentLineId: LineId
     linesCount: number
