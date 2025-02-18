@@ -1,7 +1,5 @@
 import type { BlockId, Blocks } from "$lib/types/block"
 import type { LineId, Lines } from "$lib/types/line"
-import type { BlockModel } from "../block"
-import type { LineModel } from "../line"
 
 export interface AppState {
     linesId: LineId[]

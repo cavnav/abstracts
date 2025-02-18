@@ -75,10 +75,6 @@ export function addLine({ lineId }: AddLine) {
 // Обёртка для обновления стора и вычисления флагов
 const updateStore = (updater: (state: AppState) => void) => {
 	store.update((state) => {
-	  // Сохраняем исходные значения для проверки изменений
-	  const prevLinesCount = state.linesId.length;
-	  const prevBlocksCount = Object.keys(state.blocks).length;
-  
 	  // Мутируем состояние через updater
 	  updater(state);
   
@@ -86,6 +82,6 @@ const updateStore = (updater: (state: AppState) => void) => {
 	  state.linesCount = state.linesId.length;
 	  state.blocksCount = Object.keys(state.blocks).length;
   
-	  return state; // Возвращаем мутированное состояние
+	  return state // Возвращаем мутированное состояние
 	})
   }
