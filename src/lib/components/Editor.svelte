@@ -1,8 +1,10 @@
 <script lang="ts">
     import Line from '$lib/components/Line.svelte';
     import { ARITHMETIC_OPERATORS } from '$lib/constants/arithOperators';
-    import { addBlock, addLine, addOperator, currentBlock, currentLine, store } from '$lib/stores/store';
+    import { addBlock, addLine, addOperator, currentBlock, currentLine, store, updateStore } from '$lib/stores/store';
+    import type { BlockId } from '$lib/types/block';
     import { isVariableName } from '$lib/utils/isVariableName';
+    import { placeCursorAtStart } from '$lib/utils/placeCursor';
     import { getLines } from '$lib/utils/selectors/getLines';
     import { derived, get } from 'svelte/store';
   
@@ -36,6 +38,13 @@
             if (event.key === ' ') {
                 handleSpace({event})                
             }    
+            if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                moveToNextBlock(); // В конец предыдущего блока
+            } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                moveToPreviousBlock(); // В начало следующего блока
+            }
             else if (event.key === "ArrowDown") {
                 const [lastLineId] = $store.linesId.slice(-1)
 
@@ -50,6 +59,14 @@
                 addOperator({lineId, blockId, text: event.key})                
             }
         }
+    }
+
+    function moveToPreviousBlock() {
+        
+    }
+
+    function moveToNextBlock() {        
+        //cursorAtStart.set(true)
     }
 
     function handleSpace({event}: {event: KeyboardEvent}) {

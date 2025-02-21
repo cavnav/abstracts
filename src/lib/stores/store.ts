@@ -73,7 +73,7 @@ export function addLine({ lineId }: AddLine) {
 
 
 // Обёртка для обновления стора и вычисления флагов
-const updateStore = (updater: (state: AppState) => void) => {
+export function updateStore(updater: (state: AppState) => void) {
 	store.update((state) => {
 	  // Мутируем состояние через updater
 	  updater(state);

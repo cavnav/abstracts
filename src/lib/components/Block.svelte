@@ -15,12 +15,10 @@
 
 	let inputElement: HTMLInputElement | undefined
 
-	function handleFocus() {		
+	function setFocus() {		
 		if (!inputElement) {
 			return
 		}
-		
-		inputElement.focus()
 
 		if (true) {
 			placeCursorAtStart({block: inputElement})	
@@ -42,7 +40,7 @@
 
   	$: {
 		if ($currentFocusId === id && inputElement) {
-			handleFocus()
+			setFocus()
 		}			
 	}
 </script>

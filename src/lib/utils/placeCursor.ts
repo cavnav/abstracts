@@ -1,22 +1,31 @@
 export function placeCursorAtStart({ block }: { block: HTMLElement }) {
-    block.focus();
-
-    // Ищем input внутри блока
     const inputElement = block.querySelector('input') as HTMLInputElement;
-
     if (inputElement) {
-        // Устанавливаем фокус на input
-        inputElement.focus();
+        const range = createRange(inputElement, 0);
+        setCursor(block, range);
+    }
+}
 
-        // Перемещаем курсор в начало
-        const range = document.createRange();
-        range.setStart(inputElement, 0);  // Устанавливаем курсор в начало
-        range.setEnd(inputElement, 0);    // Устанавливаем конец диапазона в начало
+export function placeCursorAtEnd({ block }: { block: HTMLElement }) {
+    const inputElement = block.querySelector('input') as HTMLInputElement;
+    if (inputElement) {
+        const range = createRange(inputElement, inputElement.value.length);
+        setCursor(block, range);
+    }
+}
 
-        const selection = window.getSelection();
-        if (selection) {
-            selection.removeAllRanges();
-            selection.addRange(range);  // Устанавливаем новый диапазон
-        }
+function createRange(inputElement: HTMLInputElement, position: number): Range {
+    const range = document.createRange();
+    range.setStart(inputElement, position);
+    range.setEnd(inputElement, position);
+    return range;
+}
+
+function setCursor(block: HTMLElement, range: Range) {
+    block.focus();
+    const selection = window.getSelection();
+    if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
     }
 }
