@@ -9,25 +9,44 @@ import { NamespaceManager } from '$lib/managers/namespaceManager';
 const namespaceManager = new NamespaceManager()
 
 const initialStore: AppState = {
-	blocks: { '1': { id: '1', text: 'Block1' }, '2': { id: '2', text: 'Block2' }, '3': { id: '3', text: 'Block3' } },
+	blocks: {
+		'1': { id: '1', text: 'Block1' },
+		'2': { id: '2', text: 'Block2' },
+		'3': { id: '3', text: 'Block3' }
+	},
 	lines: {
 		'1': { id: '1', blocksId: ['1', '2'] },
-		'2': { id: '2', blocksId: ['3'] },
+		'2': { id: '2', blocksId: ['3'] }
 	},
 	linesId: ['1', '2'],
-	currentFocusId: '2',
-	currentLineId: '1',
 	linesCount: 1,
-	blocksCount: 1,
-	isChangedLines: false,
-	isChangedBlocks: false
-}
+	blocksCount: 1
+};
 
+// Основное состояние (структурные данные)
 export const store = writable<AppState>(initialStore);
 
-export const currentBlock = derived(store, $store => $store.blocks[$store.currentFocusId])
-export const currentLine = derived(store, $store => $store.lines[$store.currentLineId])
+// Выносим часто изменяемые переменные в отдельные сторы
+export const currentFocusId = writable<string>('2');
+export const currentLineId = writable<string>('1');
 
+// Флаги изменений
+export const isChangedLines = writable(false);
+export const isChangedBlocks = writable(false);
+
+// Флаги положения курсора внутри блока
+export const cursorAtStart = writable(false);
+export const cursorAtEnd = writable(false);
+
+export const currentBlock = derived(
+	[store, currentFocusId],
+	([$store, $currentFocusId]) => $store.blocks[$currentFocusId]
+);
+
+export const currentLine = derived(
+	[store, currentLineId],
+	([$store, $currentLineId]) => $store.lines[$currentLineId]
+);
 
 
 export function addBlock({ lineId, blockId, text, parentBlockId }: AddBlock) {
@@ -35,7 +54,7 @@ export function addBlock({ lineId, blockId, text, parentBlockId }: AddBlock) {
 	let newBlock
 	updateStore(state => {
 		newBlock = addBlockToLine({ state, lineId, blockId, text, parentBlockId })
-		state.currentFocusId = newBlock.id
+		currentFocusId.set(newBlock.id)
 		return state // Возвращаем обновленное состояние
 	})
 
@@ -45,29 +64,27 @@ export function addBlock({ lineId, blockId, text, parentBlockId }: AddBlock) {
 export function addOperator({ lineId, blockId, text }: AddOperator) {
 	store.update(state => {
 		const operatorBlock = addBlockToLine({
-			state, 
-			lineId, 
-			blockId, 
-			text, 
+			state,
+			lineId,
+			blockId,
+			text,
 			parentBlockId: ''
 		})
-		const newBlock = addBlockToLine({ 
-			state, 
-			lineId, 
-			blockId: operatorBlock.id, 
-			text: '', 
-			parentBlockId: '' 
+		const newBlock = addBlockToLine({
+			state,
+			lineId,
+			blockId: operatorBlock.id,
+			text: '',
+			parentBlockId: ''
 		})
-		state.currentFocusId = newBlock.id
 		return state // Возвращаем обновленное состояние
-	});
+	})
 }
 
 export function addLine({ lineId }: AddLine) {
 	updateStore(state => {
 		const newLineId = addNewLine({ state, lineId })
-		const newBlock = addBlockToLine({ state, lineId: newLineId, blockId: '', text: '', parentBlockId: '' })
-		state.currentFocusId = newBlock.id
+		addBlockToLine({ state, lineId: newLineId, blockId: '', text: '', parentBlockId: '' })
 	})
 }
 
@@ -75,13 +92,13 @@ export function addLine({ lineId }: AddLine) {
 // Обёртка для обновления стора и вычисления флагов
 export function updateStore(updater: (state: AppState) => void) {
 	store.update((state) => {
-	  // Мутируем состояние через updater
-	  updater(state);
-  
-	  // Обновляем счетчики
-	  state.linesCount = state.linesId.length;
-	  state.blocksCount = Object.keys(state.blocks).length;
-  
-	  return state // Возвращаем мутированное состояние
+		// Мутируем состояние через updater
+		updater(state);
+
+		// Обновляем счетчики
+		state.linesCount = state.linesId.length;
+		state.blocksCount = Object.keys(state.blocks).length		
+
+		return state // Возвращаем мутированное состояние
 	})
-  }
+}

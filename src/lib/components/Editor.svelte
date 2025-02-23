@@ -1,8 +1,7 @@
 <script lang="ts">
     import Line from '$lib/components/Line.svelte';
     import { ARITHMETIC_OPERATORS } from '$lib/constants/arithOperators';
-    import { addBlock, addLine, addOperator, currentBlock, currentLine, store, updateStore } from '$lib/stores/store';
-    import type { BlockId } from '$lib/types/block';
+    import { addBlock, addLine, addOperator, currentBlock, currentLine, store, currentFocusId } from '$lib/stores/store';
     import { isVariableName } from '$lib/utils/isVariableName';
     import { placeCursorAtStart } from '$lib/utils/placeCursor';
     import { getLines } from '$lib/utils/selectors/getLines';
@@ -62,7 +61,7 @@
     }
 
     function moveToPreviousBlock() {
-        
+
     }
 
     function moveToNextBlock() {        
@@ -78,7 +77,7 @@
         }        
     }
 
-    $: console.log('state', JSON.stringify($store))
+    $: console.log('state', JSON.stringify($store), JSON.stringify($currentFocusId))
 </script>
 
 <div id="editor" on:keydown={handleKeyDown}>

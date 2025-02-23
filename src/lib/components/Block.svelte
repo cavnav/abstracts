@@ -1,28 +1,24 @@
 <script lang="ts">
     import type { BlockModel } from "$lib/models";
-    import { store } from "$lib/stores/store";
+    import { store, currentFocusId } from "$lib/stores/store";
     import { placeCursorAtStart } from "$lib/utils/placeCursor";
-    import { derived } from "svelte/store";
 
 	export let block: BlockModel
 
 	const {id, text} = block
 
-	const currentFocusId = derived(store, ($store) => $store.currentFocusId)
 	
 	// Используем комбинированный текст: либо из пропса, либо из стора
 	$: finalText = text ? text : $store.blocks[id]?.text || ""
 
-	let inputElement: HTMLInputElement | undefined
+	let inputElement: HTMLDivElement | undefined
 
 	function setFocus() {		
 		if (!inputElement) {
 			return
 		}
-
-		if (true) {
-			placeCursorAtStart({block: inputElement})	
-		}
+		console.log('inputElement', inputElement)
+		placeCursorAtStart({block: inputElement})	
 	}
 
 	function updateText(event: Event) {
@@ -45,12 +41,11 @@
 	}
 </script>
 
-<div class="block">
+<div class="block" bind:this={inputElement}>
 	<input
 		type="text"
 		value={finalText}
-		data-block-id={id} 
-		bind:this={inputElement}
+		data-block-id={id} 		
 		on:input={updateText}
 	/>
 </div>
