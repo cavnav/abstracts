@@ -1,6 +1,6 @@
 import type { INode, INodeId } from "$lib/types/ast"
 
-export class Node implements INode {
+export class NodeClass implements INode {
     id: INodeId
     name: string
     value: INode[]
