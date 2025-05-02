@@ -1,18 +1,11 @@
 <script lang="ts">
     import { Node } from "$lib/entities/classes/Node";
     import { store } from "$lib/stores/store";
-    import { placeCursorAtStart } from "$lib/utils/placeCursor";
     import { onMount } from "svelte";
 
 	export let node: Node;
   
 	let inputElement: HTMLDivElement | undefined; // Пока компонент не отрендерен
-  
-	function setFocus() {
-	  if (inputElement) {
-		placeCursorAtStart({node: inputElement});
-	  }
-	}
   
 	onMount(() => {
 	  if (inputElement) {
@@ -33,15 +26,13 @@
 	}
   </script>
 
-<div class="node" bind:this={inputElement} data-node-id={node.id}>
 	<div
+	  class="node" bind:this={inputElement} data-node-id={node.id}
 	  contenteditable="true"
-	  class="editable"
 	  on:input={updateName}
 	>
 	  {node.name}
 	</div>
-  </div>
   
   <style>
 	.node {
@@ -49,13 +40,11 @@
 	  padding: 5px 10px;
 	  min-width: 50px;
 	  display: inline-block;
+	  outline: none;
 	}
   
 	.node:focus {
 	  border-color: blue;
 	}
   
-	.editable {
-	  outline: none;
-	}
   </style>
