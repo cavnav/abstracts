@@ -31,6 +31,7 @@
 	<div class="node-wrapper">
 		<div
 		  class="node"
+		  data-id={node.id}
 		  contenteditable="true"
 		  on:input={updateName}
 		>
@@ -40,7 +41,7 @@
 		<!-- Рекурсивный вызов для потомков -->
 		{#if node.value.length > 0}
 			{#each node.value as child}
-			  <Node node={child} />
+			  <Node node={child}/>
 			{/each}
 		{/if}
 	  </div>
