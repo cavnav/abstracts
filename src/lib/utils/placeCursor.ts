@@ -1,7 +1,7 @@
 type CursorPosition = 'start' | 'end' | number;
 
 type PlaceCursorOptions = {
-  node: HTMLElement;
+  node: HTMLElement | null;
   position?: CursorPosition;
 };
 
@@ -27,10 +27,10 @@ export function placeCursor({ node, position = 'end' }: PlaceCursorOptions) {
   node.focus();
 }
 
-export function placeCursorAtStart({ node }: { node: HTMLElement }) {
+export function placeCursorAtStart({ node }: { node: HTMLElement | null }) {
   placeCursor({ node, position: 'start' });
 }
 
-export function placeCursorAtEnd({ node }: { node: HTMLElement }) {
+export function placeCursorAtEnd({ node }: { node: HTMLElement | null }) {
   placeCursor({ node, position: 'end' });
 }
