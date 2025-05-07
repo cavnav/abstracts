@@ -7,6 +7,7 @@ export class NodeClass implements INode {
     prevId: INodeId | null
     nextId: INodeId | null
     parentId: INodeId | null
+    isAssignment?: boolean
 
     constructor({
         id,
@@ -15,6 +16,7 @@ export class NodeClass implements INode {
         prevId,
         nextId,
         parentId,
+        isAssignment,
     }: INode) {
         this.id = id
         this.name = name
@@ -22,5 +24,6 @@ export class NodeClass implements INode {
         this.prevId = prevId
         this.nextId = nextId
         this.parentId = parentId
+        this.isAssignment = isAssignment
     }
 }

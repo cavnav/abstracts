@@ -1,21 +1,21 @@
 type CursorPosition = 'start' | 'end' | number;
 
 type PlaceCursorOptions = {
-  node: HTMLElement | null;
+  element: HTMLElement | null;
   position?: CursorPosition;
 };
 
-export function placeCursor({ node, position = 'end' }: PlaceCursorOptions) {
-  if (!node || !node.isContentEditable) return;
+export function placeCursor({ element, position = 'end' }: PlaceCursorOptions) {
+  if (!element || !element.isContentEditable) return;
 
   const selection = window.getSelection();
   if (!selection) return;
 
   const range = document.createRange();
-  range.selectNodeContents(node);
+  range.selectNodeContents(element);
 
   if (typeof position === 'number') {
-    const target = node.firstChild ?? node;
+    const target = element.firstChild ?? element;
     range.setStart(target, position);
     range.collapse(true);
   } else {
@@ -24,13 +24,13 @@ export function placeCursor({ node, position = 'end' }: PlaceCursorOptions) {
 
   selection.removeAllRanges();
   selection.addRange(range);
-  node.focus();
+  element.focus();
 }
 
-export function placeCursorAtStart({ node }: { node: HTMLElement | null }) {
-  placeCursor({ node, position: 'start' });
+export function placeCursorAtStart({ element }: { element: HTMLElement | null }) {
+  placeCursor({ element, position: 'start' });
 }
 
-export function placeCursorAtEnd({ node }: { node: HTMLElement | null }) {
-  placeCursor({ node, position: 'end' });
+export function placeCursorAtEnd({ element }: { element: HTMLElement | null }) {
+  placeCursor({ element, position: 'end' });
 }

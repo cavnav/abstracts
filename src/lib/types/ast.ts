@@ -7,4 +7,5 @@ export interface INode {
     nextId: INodeId | null
     prevId: INodeId | null
     parentId: INodeId | null
+    isAssignment?: boolean
 }

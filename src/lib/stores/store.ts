@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { INode } from '$lib/types/ast';
+import type { INode, INodeId } from '$lib/types/ast';
 import { NodeClass } from '$lib/entities/classes/Node';
 
 class NodeIndex {
@@ -35,7 +35,7 @@ const nodes = new Map([
 			prevId: null,
 			nextId: null,
 			value: [
-				new NodeClass({ id: '2', name: 'aaa', parentId: '1', prevId: 'null', nextId: '22', value: [] }),
+				new NodeClass({ id: '2', name: 'aaa', parentId: '1', prevId: null, nextId: '22', value: [] }),
 				new NodeClass({ id: '22', name: '+', parentId: '1', prevId: '2', nextId: '3', value: [] }),
 				new NodeClass({ id: '3', name: 'bbb', parentId: '1', prevId: '22', nextId: '33', value: [] }),
 				new NodeClass({ id: '33', name: '+', parentId: '1', prevId: '3', nextId: '4', value: [] }),
@@ -45,10 +45,15 @@ const nodes = new Map([
 	],
 ])
 
-
-export const store = writable({
+type IStore = {
+	nodes: Map<string, INode>
+	index: NodeIndex
+	activeNodeId: INodeId | null
+}
+export const store = writable<IStore>({
     nodes, // Узлы верхнего уровня (строки редактора)
-    index: new NodeIndex() // Плоский индекс всех узлов
+    index: new NodeIndex(), // Плоский индекс всех узлов
+	activeNodeId: '1',
 });
 
 // Инициализация индекса

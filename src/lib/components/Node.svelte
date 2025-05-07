@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { NodeClass } from '$lib/entities/classes/Node';
+	import clsx from 'clsx';
 	import Node from './Node.svelte';
   import { store } from '$lib/stores/store';
+  import { placeCursorAtStart } from '$lib/utils/placeCursor';
 
 	export let node: NodeClass;
 	export let register: (id: string, el: HTMLElement) => void;
@@ -11,14 +13,18 @@
 	let element: HTMLDivElement;
 
 	onMount(() => {
-		element.innerText = node.name;
 		register(node.id, element);
-	});
 
-	onDestroy(() => {
-		unregister(node.id);
-	});
+		if (node.id === $store.activeNodeId) {
+			queueMicrotask(() => {
+				placeCursorAtStart({ element });
+				$store.activeNodeId = null; // очистить, если нужно
+			});
+		}
 
+		return () => unregister(node.id);
+	});
+	
 	function updateName(event: Event) {
 		const target = event.target as HTMLDivElement;
 
@@ -35,7 +41,7 @@
 
 <div class="node-wrapper">
 	<div
-		class="node"
+		class={clsx('node', { assignment: node.isAssignment })}
 		bind:this={element}
 		contenteditable="true"
 		on:input={updateName}
@@ -56,16 +62,14 @@
 	display: flex;
 }
 .node {
-	border: 1px solid #ccc;
-	padding: 5px 10px;
-	min-width: 50px;
+	padding: 4px 2px;
 	display: inline-block;
 	outline: none;
 	text-align: center;
-	border-radius: 6px;
 	transition: border-color 0.2s;
 }
-.node:focus {
-	border-color: blue;
+
+.node.assignment {
+	border-right: 2px solid var(--assign-color-light);
 }
 </style>
