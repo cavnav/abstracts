@@ -27,3 +27,5 @@ export class NodeClass implements INode {
         this.isAssignment = isAssignment
     }
 }
+
+export type INodeClass = InstanceType<typeof NodeClass>;

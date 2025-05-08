@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { NodeClass } from '$lib/entities/classes/Node';
 	import clsx from 'clsx';
 	import Node from './Node.svelte';
-  import { store } from '$lib/stores/store';
   import { placeCursorAtStart } from '$lib/utils/placeCursor';
+  import { astStore } from '$lib/stores/store';
+  import {type INodeClass} from '$lib/entities/classes/node'
 
-	export let node: NodeClass;
+	export let node: INodeClass;
 	export let register: (id: string, el: HTMLElement) => void;
 	export let unregister: (id: string) => void;
 
@@ -15,10 +15,10 @@
 	onMount(() => {
 		register(node.id, element);
 
-		if (node.id === $store.activeNodeId) {
+		
+		if (node.id === $astStore.activeNodeId) {
 			queueMicrotask(() => {
 				placeCursorAtStart({ element });
-				$store.activeNodeId = null; // очистить, если нужно
 			});
 		}
 
@@ -28,7 +28,7 @@
 	function updateName(event: Event) {
 		const target = event.target as HTMLDivElement;
 
-		store.update(state => {
+		astStore.update(state => {
 			const currentNode = state.nodes.get(node.id);
 			if (currentNode) {
 				currentNode.name = target.innerText;
