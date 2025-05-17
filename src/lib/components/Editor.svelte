@@ -3,6 +3,14 @@
 	import { placeCursorAtStart, placeCursorAtEnd } from '$lib/utils/placeCursor';
   import { astFacade } from '$lib/entities/classes/astFacadeWithState';
   import { astStore } from '$lib/stores/store';
+  import { get } from 'svelte/store';
+  import { setupNodeFactory } from '$lib/entities/classes/setupNodeFactory';
+  import { onMount } from 'svelte';
+
+    // Подключим фабрику один раз при монтировании редактора
+  onMount(() => {
+    setupNodeFactory();
+  });
 
 	const nodeRefs = new Map<string, HTMLElement>();
 
@@ -15,84 +23,65 @@
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
-	const selection = window.getSelection();
-	const range = selection?.getRangeAt(0);
-	const target = event.target as HTMLElement;
-	const nodeId = target?.dataset?.id;
+  const selection = window.getSelection();
+  const range = selection?.getRangeAt(0);
+  const target = event.target as HTMLElement;
+  const nodeId = target?.dataset?.id;
 
-	if (!nodeId || !range) return;
+  if (!nodeId || !range) return;
 
-    astStore.update(state => {
-        const currentNode = state.index.get(nodeId);
-        if (!currentNode) return state;
+  // Если пробел и курсор в конце, и в тексте пробела ещё нет — вставляем узел и предотвращаем пробел
+  if (
+    event.key === ' ' &&
+    range.startOffset === (target.textContent?.length ?? 0) &&
+    target.textContent?.indexOf(' ') === -1
+  ) {
+    event.preventDefault();  // Остановить вставку пробела
 
-        // ← Влево
-        if (event.key === 'ArrowLeft' && range.startOffset === 0) {
-            const prevEl = currentNode.prevId
-                ? nodeRefs.get(currentNode.prevId)
-                : currentNode.parentId
-                    ? nodeRefs.get(currentNode.parentId)
-                    : null;
+    const currentNode = get(astStore).index.get(nodeId);
+    const parentIdForNewNode = currentNode?.parentId ?? currentNode?.id;
 
-            if (prevEl) {
-                placeCursorAtEnd({ element: prevEl });
-                event.preventDefault();
-            }
-        }
+    if (parentIdForNewNode) {
+      const newNode = {
+        name: '',
+        value: [],
+        prevId: null,
+        nextId: null,
+        parentId: parentIdForNewNode,
+      };
+      astFacade.addNode({ parentId: parentIdForNewNode, nodeData: newNode });
 
-        // → Вправо (или спуск к первому потомку)
-        if (
-            event.key === 'ArrowRight' &&
-            range.startOffset === (target.textContent?.length ?? 0)
-        ) {
-            let nextEl: HTMLElement | null = null;
+      // Можно дополнительно переместить курсор на новый узел или сделать другую логику
+    }
+    return; // Завершаем, дальше обрабатывать не надо
+  }
 
-            if (currentNode.nextId) {
-                nextEl = nodeRefs.get(currentNode.nextId) ?? null;
-            }
+  // Логика со стрелками — без изменений
+  astStore.update(state => {
+    const currentNode = state.index.get(nodeId);
+    if (!currentNode) return state;
 
-            if (!nextEl && currentNode.value?.length) {
-                const firstChildId = currentNode.value[0]?.id;
-                nextEl = firstChildId ? nodeRefs.get(firstChildId) ?? null : null;
-            }
+    if (event.key === 'ArrowLeft' && range.startOffset === 0) {
+      const prevEl = currentNode.prevId
+        ? nodeRefs.get(currentNode.prevId)
+        : currentNode.parentId
+        ? nodeRefs.get(currentNode.parentId)
+        : null;
+      if (prevEl) placeCursorAtEnd({ element: prevEl });
+    }
 
-            if (nextEl) {
-                placeCursorAtStart({ element: nextEl });
-                event.preventDefault();
-            }
-        }
+    if (event.key === 'ArrowRight' && range.startOffset === (target.textContent?.length ?? 0)) {
+      let nextEl = currentNode.nextId ? nodeRefs.get(currentNode.nextId) : null;
+      if (!nextEl && currentNode.value?.length) {
+        nextEl = nodeRefs.get(currentNode.value[0].id) ?? null;
+      }
+      if (nextEl) placeCursorAtStart({ element: nextEl });
+    }
 
-        // ПРОБЕЛ — создать узел-значение
-        if (
-            event.key === ' ' &&
-            range.startOffset === (target.textContent?.length ?? 0) &&
-            target.textContent?.indexOf(' ') === -1
-        ) {
-            if (currentNode.parentId) {
-                return state
-            }
-
-            const parentNode = state.index.get(currentNode.id)
-
-            if (!parentNode) {
-                return state
-            }
-
-                event.preventDefault();
-
-                const newNode = {
-                    name: 'a',
-                    value: [],
-                    prevId: null,
-                    nextId: null,
-                    parentId: parentNode.id
-                };
-
-                astFacade.addNode({parentId: parentNode.id, nodeData: newNode, updateParent: {isAssignment: true} });
-        }
-        return state;
-    })
+    return state;
+  });
 }
+
 
 </script>
 

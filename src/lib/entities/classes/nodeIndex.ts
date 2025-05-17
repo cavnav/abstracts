@@ -1,30 +1,30 @@
 import type { INode } from "$lib/types/ast";
+import type { IBaseNode } from "./baseNode";
 
 export class NodeIndex {
-    private map = new Map<string, INode>();
-    
-    // Добавляем узел и всех его детей в индекс
-    add(node: INode) {
-        this.map.set(node.id, node);
-        if (node.value?.length) {
-            node.value[0].prevId = node.id;
-        }
-        node.value?.forEach(child => this.add(child));
-    }
+  private map = new Map<string, IBaseNode>();
 
-    update(node: INode) {
-        this.map.set(node.id, node);
-    }
-    
-    // Удаляем узел и всех его детей из индекса
-    remove(node: INode) {
-        this.map.delete(node.id);
-        node.value?.forEach(child => this.remove(child));
-    }
-    
-    get(id: string): INode | undefined {
-        return this.map.get(id);
-    }
+  add(node: IBaseNode) {
+    this.map.set(node.id, node);
+    // Рекурсивно добавляем дочерние узлы
+    node.value.forEach(child => this.add(child));
+  }
+
+  get(id: string): IBaseNode | undefined {
+    return this.map.get(id);
+  }
+
+  remove(id: string) {
+    this.map.delete(id);
+  }
+
+  update(node: IBaseNode) {
+    this.map.set(node.id, node)
+  }
+
+  clear() {
+    this.map.clear();
+  }
 }
 
 export type INodeIndex = InstanceType<typeof NodeIndex>;

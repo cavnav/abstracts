@@ -4,7 +4,8 @@ import { type IASTManager } from "$lib/managers/astManager";
 import { astStore } from "$lib/stores/store";
 import type { INode } from "$lib/types/ast";
 import { generateId } from "$lib/utils/generateId";
-import { NodeClass } from "./node";
+import { IdentifierNode } from "./identifierNode";
+import { interpreter } from "./setupInterpeter";
 
 export class ASTFacadeWithState {
     private manager
@@ -14,7 +15,7 @@ export class ASTFacadeWithState {
     }
 	
 
-	addNode({ parentId, nodeData, updateParent = {} }: { 
+	addNode({ parentId, nodeData }: { 
     parentId: string, 
     nodeData: Omit<INode, 'id'>, 
     updateParent?: Partial<INode> 
@@ -24,7 +25,7 @@ export class ASTFacadeWithState {
         if (!parent) return s;
     
         // Создание нового узла
-        const node = new NodeClass({ ...nodeData, id: generateId() });
+        const node = new IdentifierNode({ ...nodeData, id: generateId() });
 
         // Находим место для добавления нового узла в дочерние элементы родителя
         let prevNode = parent.value[parent.value.length - 1]; // Сосед по предшествующему узлу
@@ -39,26 +40,24 @@ export class ASTFacadeWithState {
 
         // Добавление дочернего узла к родителю
         const { updatedParent, child } = this.manager.addChild(parent, node);
-    
-        const finalUpdatedParent = {
-            ...updatedParent,
-            ...updateParent,
-        };
 
-        if (!finalUpdatedParent.parentId) {
-            s.nodes.set(finalUpdatedParent.id, finalUpdatedParent);
+        if (!updatedParent.parentId) {
+            s.nodes.set(updatedParent.id, updatedParent);
         }
     
-        s.index.update(finalUpdatedParent);
+        s.index.update(updatedParent);
     
         // Добавляем новый дочерний узел в индекс
         s.index.add(child);
     
         // Обновляем активный узел
-        s.activeNodeId = child.id;
+        s.activeNodeId = child.id;        
+
     
         return s;
     });
+
+    
 }
 
     
@@ -75,7 +74,7 @@ export class ASTFacadeWithState {
 			const { updatedParent } = this.manager.removeNode(node, parent);
 	
 			// Обновляем индекс
-			s.index.remove(node);
+			s.index.remove(node.id);
 			s.index.add(updatedParent);
 	
 			// Сброс активного узла, если он удалён

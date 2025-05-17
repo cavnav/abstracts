@@ -1,60 +1,83 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import clsx from 'clsx';
-	import Node from './Node.svelte';
+  import { onMount } from 'svelte';
+  import clsx from 'clsx';
+  import Node from './Node.svelte';
   import { placeCursorAtStart } from '$lib/utils/placeCursor';
   import { astStore } from '$lib/stores/store';
-  import {type INodeClass} from '$lib/entities/classes/node'
+  import type { BaseNode } from '$lib/entities/classes/baseNode';
 
-	export let node: INodeClass;
-	export let register: (id: string, el: HTMLElement) => void;
-	export let unregister: (id: string) => void;
+  export let node: BaseNode;
+  export let register: (id: string, el: HTMLElement) => void;
+  export let unregister: (id: string) => void;
 
-	let element: HTMLDivElement;
+  let element: HTMLDivElement;
 
-	onMount(() => {
-		register(node.id, element);
+  // Динамическое определение типа узла по имени
+  $: nodeType = (() => {
+    if (!node.name) return 'empty';
+    if (/^\d+(\.\d+)?$/.test(node.name)) return 'literal';          // Число
+    if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(node.name)) return 'identifier'; // Идентификатор
+    return 'unknown';
+  })();
 
-		
-		if (node.id === $astStore.activeNodeId) {
-			queueMicrotask(() => {
-				placeCursorAtStart({ element });
-			});
-		}
+  // Синхронизация содержимого contenteditable с node.name — вручную, чтобы избежать мерцания
+  function syncContent() {
+    if (!element) return;
+    if (element.innerText !== node.name) {
+      element.innerText = node.name;
+    }
+  }
 
-		return () => unregister(node.id);
-	});
-	
-	function updateName(event: Event) {
-		const target = event.target as HTMLDivElement;
+  onMount(() => {
+    register(node.id, element);
 
-		astStore.update(state => {
-			const currentNode = state.nodes.get(node.id);
-			if (currentNode) {
-				currentNode.name = target.innerText;
-			}
-			return state;
-		});
-	}
+    // Устанавливаем начальное содержимое
+    syncContent();
 
+    if (node.id === $astStore.activeNodeId) {
+      queueMicrotask(() => {
+        placeCursorAtStart({ element });
+      });
+    }
+
+    return () => unregister(node.id);
+  });
+
+  // При обновлении node.name — синхронизируем DOM
+  $: syncContent();
+
+  // Обработка ввода
+  function updateName(event: Event) {
+    const target = event.target as HTMLDivElement;
+    const text = target.innerText.trim();
+
+    astStore.update(state => {
+      const current = state.nodes.get(node.id);
+      if (current) {
+        current.name = text;
+      }
+
+	  
+      return state;
+    });
+  }
 </script>
 
 <div class="node-wrapper">
-	<div
-		class={clsx('node', { assignment: node.isAssignment })}
-		bind:this={element}
-		contenteditable="true"
-		on:input={updateName}
-		data-id={node.id}
-	>
-		{node.name}
-	</div>
+  <div
+    class={clsx('node', nodeType)}
+    bind:this={element}
+    contenteditable="true"
+    spellcheck="false"
+    on:input={updateName}
+    data-id={node.id}
+  ></div>
 
-	{#if node.value.length > 0}
-		{#each node.value as child}
-			<Node node={child} register={register} unregister={unregister} />
-		{/each}
-	{/if}
+  {#if node.value.length > 0}
+    {#each node.value as child}
+      <Node node={child} register={register} unregister={unregister} />
+    {/each}
+  {/if}
 </div>
 
 <style>
@@ -67,9 +90,10 @@
 	outline: none;
 	text-align: center;
 	transition: border-color 0.2s;
+	border: 1px solid;
 }
 
-.node.assignment {
+.node.identifier {
 	border-right: 2px solid var(--assign-color-light);
 }
 </style>

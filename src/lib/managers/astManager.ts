@@ -1,25 +1,23 @@
-import type { INode } from '$lib/types/ast';
+import type { IBaseNode } from '$lib/entities/classes/baseNode';
 
 export class ASTManager {
-	addChild(parent: INode, child: INode): { updatedParent: INode, child: INode } {
-		child.parentId = parent.id;
-		const updatedParent = {
-			...parent,
-			value: [...parent.value, child],
-		};
-	
-		return { updatedParent, child };
-	}
+  addChild(parent: IBaseNode, child: IBaseNode): { updatedParent: IBaseNode; child: IBaseNode } {
+    child.parentId = parent.id;
+    
+    // Создаём новый экземпляр родителя с обновлённым списком дочерних
+    const updatedParent = parent.cloneWith({
+      value: [...parent.value, child],
+    });
+    
+    return { updatedParent, child };
+  }
 
-	removeNode(node: INode, parent: INode): { updatedParent: INode } {
-		const updatedParent = {
-			...parent,
-			value: parent.value.filter(n => n.id !== node.id),
-		};
-		return { updatedParent };
-	}
-	
+  removeNode(node: IBaseNode, parent: IBaseNode): { updatedParent: IBaseNode } {
+    const updatedParent = parent.cloneWith({
+      value: parent.value.filter(n => n.id !== node.id),
+    });
+    return { updatedParent };
+  }
 }
 
 export type IASTManager = InstanceType<typeof ASTManager>
-

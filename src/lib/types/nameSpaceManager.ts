@@ -15,9 +15,4 @@ export interface NameParams {
 export interface INamespaceManager {
     setVariable<T>(params: VariableParams<T>): void
     getVariable<T>(params: NameParams): T | undefined
-    setFunction(params: FunctionParams): void
-    getFunction(params: NameParams): (() => any) | undefined
-    deleteVariable(params: NameParams): boolean
-    deleteFunction(params: NameParams): boolean
-    createChild(): INamespaceManager
 }
