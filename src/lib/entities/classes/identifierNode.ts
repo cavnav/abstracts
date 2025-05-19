@@ -14,14 +14,13 @@ export class IdentifierNode extends BaseNode {
 		});
 	}
 	async evaluate({ namespace }: { namespace: NamespaceManager }): EvaluateResult {
-		 let result;
-		for (const node of this.value) {
-			result = await node.evaluate({ namespace });
-		}
-
-		// записываем в namespace
-		if (result) {
-			namespace.setVariable({name: this.name, value: result});
+		 const valueNode = this.value[0];
+		 if (!valueNode) {
+			return
+		 }
+		const result = await valueNode.evaluate({ namespace });
+		if (result !== undefined) {
+		namespace.setVariable({ name: this.name, value: result });
 		}
 		return result;
 	}

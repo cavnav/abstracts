@@ -13,6 +13,9 @@ export class LiteralNode extends BaseNode {
         });
     }
     async evaluate(): EvaluateResult {
-        return this.value[0]
+        const raw = this.name;
+        if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw);
+        if (/^".*"$|^'.*'$/.test(raw)) return raw.slice(1, -1);
+        return raw;
     }
 }

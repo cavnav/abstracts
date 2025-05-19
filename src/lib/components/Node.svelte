@@ -5,6 +5,7 @@
   import { placeCursorAtStart } from '$lib/utils/placeCursor';
   import { astStore } from '$lib/stores/store';
   import type { BaseNode } from '$lib/entities/classes/baseNode';
+  import { astFacade } from '$lib/entities/classes/astFacadeWithState';
 
   export let node: BaseNode;
   export let register: (id: string, el: HTMLElement) => void;
@@ -51,15 +52,9 @@
     const target = event.target as HTMLDivElement;
     const text = target.innerText.trim();
 
-    astStore.update(state => {
-      const current = state.nodes.get(node.id);
-      if (current) {
-        current.name = text;
-      }
-
-	  
-      return state;
-    });
+    if (text !== node.name) {
+      astFacade.updateNodeNameAndEvaluate(node.id, text);
+    }
   }
 </script>
 
