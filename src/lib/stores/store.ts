@@ -1,28 +1,14 @@
-import type { IBaseNode } from "$lib/entities/classes/baseNode";
-import { IdentifierNode } from "$lib/entities/classes/identifierNode";
-import { NodeIndex, type INodeIndex } from "$lib/entities/classes/nodeIndex";
+import type { ASTState } from "$lib/managers/ast/types";
+import { nodesFactory } from "$lib/managers/nodesFactory";
 import { writable } from "svelte/store";
 
-interface ASTState {
-  nodes: Map<string, IBaseNode>;
-  index: INodeIndex;
-  dirty: Map<string, boolean>;
-  activeNodeId: string | null;
-}
-
-const firstNode = new IdentifierNode({ id: 'first'})
+const programmNode = nodesFactory.createProgrammNode()
+{
+  children: [nodesFactory.createLiteralNode({ value: "Hello" })],
+});
 
 export const astStore = writable<ASTState>({
-  nodes: new Map([[firstNode.id, firstNode]]),
-  index: new NodeIndex(),
-  dirty: new Map(),
-  activeNodeId: null,
+  nodes: new Map([[programmNode.id, programmNode]]),
+  activeNodeId: programmNode.children![0].id,
+  root: programmNode,
 });
-
-// Инициализация индекса
-astStore.update(s => {
-    s.nodes.forEach(node => s.index.add(node));
-    return s;
-});
-
-

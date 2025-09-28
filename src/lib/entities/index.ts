@@ -1,0 +1,5 @@
+export {BaseNode} from "./baseNode"
+export {IdentifierNode} from "./identifierNode"
+export {AssignmentNode} from "./assignmentNode"
+export {LiteralNode} from "./literalNode"
+export {ProgrammNode} from "./programmNode"

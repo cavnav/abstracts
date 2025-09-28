@@ -1,5 +1,5 @@
 import { Interpreter } from "./interpeter";
-import { namespaceManager } from "./namespaceManager";
+import { namespaceManager } from "../managers/namespaceManager";
 
 
 

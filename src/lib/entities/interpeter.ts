@@ -11,6 +11,7 @@ export class Interpreter {
 
   // Выполнить узел (и дочерние)
   async evaluateNode(node: IBaseNode): Promise<EvaluateResult> {
+    console.log('namespace', this.namespace)
     // В каждом узле своя evaluate, которая может рекурсивно вызывать evaluate дочерних
     return await node.evaluate({ namespace: this.namespace });
   }

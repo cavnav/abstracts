@@ -1,5 +1,4 @@
-import type { INode } from "$lib/types/ast";
-import type { IBaseNode } from "./baseNode";
+import type { IBaseNode, INode } from "$lib/types/ast";
 
 export class NodeIndex {
   private map = new Map<string, IBaseNode>();

@@ -1,6 +1,6 @@
 import type { LineModel } from "$lib/models";
 import type { AppState } from "$lib/models/states/appState";
-import { generateId } from "./generateId";
+import { generateId } from "./idGenerator";
 
 interface AddNewLine {
     state: AppState

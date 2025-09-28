@@ -1,5 +1,5 @@
 import type { BlockModel } from '$lib/models/';
-import { generateId } from '$lib/utils/generateId';
+import { generateId } from '$lib/utils/idGenerator';
 import type { AddBlockToLine } from './addBlockToLineTypes';
 
 export function addBlockToLine({ state, lineId, blockId, text, parentBlockId }: AddBlockToLine) {

@@ -4,27 +4,19 @@
   import Node from './Node.svelte';
   import { placeCursorAtStart } from '$lib/utils/placeCursor';
   import { astStore } from '$lib/stores/store';
-  import type { BaseNode } from '$lib/entities/classes/baseNode';
   import { astFacade } from '$lib/entities/classes/astFacadeWithState';
-
-  export let node: BaseNode;
+  import type { INode } from '$lib/types/ast';
+  
+  export let node: INode;
   export let register: (id: string, el: HTMLElement) => void;
   export let unregister: (id: string) => void;
 
   let element: HTMLDivElement;
 
-  // Динамическое определение типа узла по имени
-  $: nodeType = (() => {
-    if (!node.name) return 'empty';
-    if (/^\d+(\.\d+)?$/.test(node.name)) return 'literal';          // Число
-    if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(node.name)) return 'identifier'; // Идентификатор
-    return 'unknown';
-  })();
-
   // Синхронизация содержимого contenteditable с node.name — вручную, чтобы избежать мерцания
   function syncContent() {
     if (!element) return;
-    if (element.innerText !== node.name) {
+    if (node.name && element.innerText !== node.name) {
       element.innerText = node.name;
     }
   }
@@ -60,7 +52,7 @@
 
 <div class="node-wrapper">
   <div
-    class={clsx('node', nodeType)}
+    class={clsx('node', node.type)}
     bind:this={element}
     contenteditable="true"
     spellcheck="false"
@@ -68,7 +60,7 @@
     data-id={node.id}
   ></div>
 
-  {#if node.value.length > 0}
+  {#if node.value?.length > 0}
     {#each node.value as child}
       <Node node={child} register={register} unregister={unregister} />
     {/each}
