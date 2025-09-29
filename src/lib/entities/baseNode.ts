@@ -1,7 +1,9 @@
-import type { EvaluateResult, INodeId, NodeType, IBaseNode, PartialNode} from "$lib/types/ast";
+import type { EvaluateResult, INodeId, IBaseNode, PartialNode} from "$lib/types/ast";
 import type { INamespaceManager } from "$lib/types/namespaceManager";
+import type { NodeType } from "$lib/types/nodeTypes";
+import type { UpdateNodeParams } from "$lib/types/updateNodeParams";
 
-export abstract class BaseNode<T = unknown> implements IBaseNode<T> {
+export abstract class BaseNode<TValue = unknown> implements IBaseNode<TValue> {
   id: INodeId;
   abstract type: NodeType;
   prevId: INodeId | null;
@@ -9,15 +11,15 @@ export abstract class BaseNode<T = unknown> implements IBaseNode<T> {
   parentId: INodeId | null;
   siblingIndex: number | null = null
 
-  value: T | null;
+  value?: TValue;
 
   constructor({
     id,
-    value = null,
+    value,
     prevId = null,
     nextId = null,
     parentId = null,
-  }: PartialNode<T>) {
+  }: PartialNode<TValue>) {
     this.id = id
     this.value = value;
     this.prevId = prevId;
@@ -28,4 +30,7 @@ export abstract class BaseNode<T = unknown> implements IBaseNode<T> {
   abstract get children(): IBaseNode[];
 
   abstract evaluate(context: { namespace: INamespaceManager }): EvaluateResult | Promise<EvaluateResult>;
+   
+  // обновление данных узла
+  abstract update(params: UpdateNodeParams): void;
 }

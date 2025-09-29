@@ -1,28 +1,37 @@
 import type {
   EvaluateResult,
-  NodeType,
   PartialNode,
 } from "$lib/types/ast";
+import type { NodeType, TLiteralNodeValue } from "$lib/types/nodeTypes";
+import type { UpdateNodeParams } from "$lib/types/updateNodeParams";
 import { BaseNode } from "./baseNode";
 
-export class LiteralNode extends BaseNode {
+export class LiteralNode extends BaseNode<TLiteralNodeValue> {
   type: NodeType = "LiteralNode";
 
-  constructor(props: PartialNode) {
+  constructor(props: PartialNode<TLiteralNodeValue>) {
     super(props);
-    this.type = "LiteralNode";
   }
 
   get children() {
     return [];
   }
 
-  async evaluate(): EvaluateResult {
-    const raw = this.value;
-    if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw); // Если строка — число (123, 3.14):
-    if (/^".*"$|^'.*'$/.test(raw)) return raw.slice(1, -1); // "hello", 'world'
-    return raw;
+  setValue(newValue: string | number | boolean) {
+    this.value = newValue;
   }
+
+  update(params: UpdateNodeParams<"LiteralNode">) {
+    this.value = params.value;
+  }
+
+  async evaluate(): Promise<EvaluateResult> {
+    const raw = this.value;
+    if (/^\d+(\.\d+)?$/.test(String(raw))) return Number(raw); // числа
+    if (/^".*"$|^'.*'$/.test(String(raw))) return String(raw).slice(1, -1); // строки в кавычках
+    return raw;
+  }  
 }
+
 
 export type ILiteralNode = InstanceType<typeof LiteralNode>;

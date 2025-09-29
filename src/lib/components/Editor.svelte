@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Node from "./Node.svelte";
+  import Node from "./LiteralNode.svelte";
   import { placeCursorAtStart, placeCursorAtEnd } from "$lib/utils/placeCursor";
   import { astStore } from "$lib/stores/store";
   import { get } from "svelte/store";
@@ -27,7 +27,7 @@
     if (!nodeId || !range) return;
 
     if (event.key === "Enter") {      
-      astFacade.addNewLineBelow(nodeId);
+      astFacade.(nodeId);
       return;
     }
 

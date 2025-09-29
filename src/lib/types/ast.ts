@@ -1,4 +1,6 @@
 import type { INamespaceManager } from "./namespaceManager";
+import type { NodeType } from "./nodeTypes";
+import type { UpdateNodeParams } from "./updateNodeParams";
 
 export type INodeId = string;
 
@@ -6,26 +8,23 @@ export type PrimitiveValue = number | string | boolean;
 
 export type NodeConstructor<T> = new (init: INode<T>) => IBaseNode<T>;
 
-// Определяем базовые типы узлов
-export type NodeType = 
-  | "LiteralNode"
-  | "IdentifierNode"
-  | "BinaryOperationNode"
-  | "AssignmentNode"
-  | "ProgrammNode";
+
 
 // Результат вычисления узла
 export type EvaluateResult = Promise<PrimitiveValue | IBaseNode | void>;
 
-export type PartialNode<T = unknown> = Partial<INode<T>> & { id: INodeId };
+export type PartialNode<T = unknown> = Partial<INode<T>> & { id: INodeId, value?: T };
 
 // Интерфейс базового узла
 export interface IBaseNode<T = unknown> extends INode<T> {
-  // Метод вычисления значения узла
+  // получение дочерних узлов (для обхода AST)
+  readonly children: IBaseNode[];
+
+  // вычисление значения узла
   evaluate(context: { namespace: INamespaceManager }): EvaluateResult | Promise<EvaluateResult>;
 
-  // Метод получения дочерних узлов (для обхода AST)
-  readonly children: IBaseNode[];
+  update(params: UpdateNodeParams): void;
+
 }
 
 // Базовый интерфейс узла без методов (для конструктора и сериализации)
@@ -37,5 +36,5 @@ export interface INode<T> {
   parentId: INodeId | null;
   siblingIndex: number | null
 
-  value: T | null
+  value?: T
 }

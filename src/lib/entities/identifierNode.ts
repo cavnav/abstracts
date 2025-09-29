@@ -1,16 +1,16 @@
-import type { EvaluateResult, IBaseNode, NodeType, PartialNode } from "$lib/types/ast";
+import type { EvaluateResult, IBaseNode, PartialNode } from "$lib/types/ast";
 import { BaseNode } from "./baseNode";
 import type { NamespaceManager } from "../managers/namespaceManager";
+import type { NodeType, TIdentifierNodeValue } from "$lib/types/nodeTypes";
+import type { UpdateNodeParams } from "$lib/types/updateNodeParams";
 
-export class IdentifierNode extends BaseNode< {
+export class IdentifierNode extends BaseNode<TIdentifierNodeValue> {
   type: NodeType = "IdentifierNode";
 
-  name: string
 
-  constructor(params: PartialNode) {
+  constructor(params: PartialNode<TIdentifierNodeValue>) {
     super(params);
-
-    this.name = params.name
+    this.value = params.value
   }
 
   // У идентификатора нет дочерних узлов
@@ -19,8 +19,16 @@ export class IdentifierNode extends BaseNode< {
   }
 
   async evaluate({ namespace }: { namespace: NamespaceManager }): Promise<EvaluateResult> {
-    const result = namespace.getVariable({ name: this.name });
+    if (this.value === undefined) {
+      return;      
+    }
+
+    const result = namespace.getVariable({ name: this.value });
     return result;
+  }
+
+  update(params: UpdateNodeParams<"IdentifierNode">) {
+    this.value = params.value
   }
 }
 

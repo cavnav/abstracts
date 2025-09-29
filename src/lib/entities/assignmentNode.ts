@@ -7,10 +7,7 @@ import type {
 import { BaseNode } from "./baseNode";
 import type { NamespaceManager } from "../managers/namespaceManager";
 
-type AssignmentValue = {
-  left: IBaseNode;
-  right: IBaseNode | null;
-};
+
 
 export class AssignmentNode extends BaseNode<AssignmentValue> {
   type: NodeType = "AssignmentNode";
