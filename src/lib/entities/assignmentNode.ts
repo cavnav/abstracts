@@ -1,43 +1,21 @@
-import type {
-  EvaluateResult,
-  IBaseNode,
-  NodeType,
-  PartialNode,
-} from "$lib/types/ast";
-import { BaseNode } from "./baseNode";
-import type { NamespaceManager } from "../managers/namespaceManager";
+import type { NodeType } from "$lib/types/nodeTypes"
+import { EvaluableNode } from "./EvaluableNode"
+import type { IdentifierNode } from "./IdentifierNode"
 
+export class AssignmentNode extends EvaluableNode {
+  type: NodeType = 'Assignment'
+  left: IdentifierNode
+  right: EvaluableNode
 
-
-export class AssignmentNode extends BaseNode<AssignmentValue> {
-  type: NodeType = "AssignmentNode";
-
-  constructor(params: PartialNode<AssignmentValue>) {
-    super(params);
-  }
-
-  get children(): IBaseNode[] {
-    const children: IBaseNode[] = [];
-    if (!this.value) {
-      return []
-    }
-    if (this.value.left) children.push(this.value.left);
-    if (this.value.right) children.push(this.value.right);
-    return children;
-  }
-
-  async evaluate({ namespace }: { namespace: NamespaceManager }): EvaluateResult {
-    if (!this.value?.left || !this.value?.right) return;
-
-    const result = await this.value.right.evaluate({ namespace });
-
-    if (this.value.left.type === "IdentifierNode") {
-      namespace.setVariable({
-        name: this.value.left.name,
-        value: result,
-      });
-    }
-
-    return result;
+  constructor({
+    left,
+    right,
+  }: {
+    left: IdentifierNode
+    right: EvaluableNode
+  }) {
+    super({value: null})
+    this.left = left
+    this.right = right
   }
 }

@@ -1,5 +1,5 @@
-export {BaseNode} from "./baseNode"
-export {IdentifierNode} from "./identifierNode"
+export {Node as BaseNode} from "./Node"
+export {IdentifierNode} from "./IdentifierNode"
 export {AssignmentNode} from "./assignmentNode"
-export {LiteralNode} from "./literalNode"
+export {LiteralNode} from "./LiteralNode"
 export {ProgrammNode} from "./programmNode"

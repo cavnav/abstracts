@@ -1,19 +1,8 @@
-import type { IBaseNode } from "./ast";
-
 // Определяем базовые типы узлов
 export type NodeType = 
-  | "LiteralNode"
-  | "IdentifierNode"
-  | "BinaryOperationNode"
-  | "AssignmentNode"
-  | "ProgrammNode";
+  | "Literal"
+  | "Identifier"
+  | "BinaryOperation"
+  | "Assignment"
+  | "Programm";
 
-  
-export type TLiteralNodeValue = string | number | boolean;  
-
-export type TAssignmentNodeValue = {
-  left: IBaseNode;
-  right: IBaseNode | null;
-};
-
-export type TIdentifierNodeValue = string

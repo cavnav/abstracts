@@ -1,10 +1,10 @@
-import type { NodeType } from "$lib/types/ast";
-import { BaseNode } from "./baseNode";
+import type { NodeType } from "$lib/types/тode.types";
+import { Node } from "./Node";
 
-export class ProgrammNode extends BaseNode {
+export class ProgrammNode extends Node {
   type: NodeType = "ProgrammNode";
 
-  private _children: BaseNode[] = [];
+  private _children: Node[] = [];
 
   constructor(params: { id: string }) {
     super({ id: params.id });
