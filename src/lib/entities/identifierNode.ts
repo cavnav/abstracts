@@ -5,9 +5,9 @@ import { EvaluableNode } from "./EvaluableNode";
 export class IdentifierNode extends EvaluableNode {
   type: NodeType = "Identifier";
 
-  constructor({value}: {value: EvaluateResult}) {
-    super({value: null});
-    this.value = value
+  constructor(params: {id: string, value: EvaluateResult}) {
+    super({id: params.id, value: null});
+    this.value = params.value
   }
 }
 

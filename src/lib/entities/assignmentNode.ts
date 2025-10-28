@@ -7,15 +7,13 @@ export class AssignmentNode extends EvaluableNode {
   left: IdentifierNode
   right: EvaluableNode
 
-  constructor({
-    left,
-    right,
-  }: {
+  constructor(params: {
+    id: string
     left: IdentifierNode
     right: EvaluableNode
   }) {
-    super({value: null})
-    this.left = left
-    this.right = right
+    super({id: params.id, value: null})
+    this.left = params.left
+    this.right = params.right
   }
 }

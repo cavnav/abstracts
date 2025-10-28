@@ -13,6 +13,9 @@ function testInterpreter() {
     nodeHandlerCore,
     runtimeGraph
   })
+
+  // x <- 1
+  interpreter.setValue({})
   
   assertEqual(interpreter.setValue("x"), 123, "Node value")
   console.log("✅ runtimeGraph basic test passed")

@@ -4,9 +4,9 @@ import { Node } from "./Node";
 export abstract class EvaluableNode extends Node {
     value: EvaluateResult
 
-    constructor({value}: {value: EvaluateResult}) {
-        super();
-        this.value = value
+    constructor(params: {id: string, value: EvaluateResult}) {
+        super({id: params.id});
+        this.value = params.value
     }
 
     getValue(): EvaluateResult {
